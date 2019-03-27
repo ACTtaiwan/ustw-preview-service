@@ -257,7 +257,7 @@ export class MemberRenderer {
     return new Promise((resolve, reject) => {
       request.get(
         url,
-        { headers: { 'X-API-Key': 'syre14A0ZO81RzG81d5L4PbjkjF4Uu0aFWSjfNqf' } },
+        { headers: { 'X-API-Key': process.env.PROPUBLICA_KEY } },
         (error, response, body) => {
           if (!error && response.statusCode === 200) {
             const json = JSON.parse(body);
