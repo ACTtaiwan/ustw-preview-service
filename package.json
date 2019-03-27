@@ -1,0 +1,36 @@
+{
+  "name": "ustw-preview-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/app.js",
+  "scripts": {
+    "start": "npm run build:live",
+    "build:live": "nodemon --ignore './data' --exec node -r ts-node/register ./src/app.ts",
+    "mock": "nodemon --ignore './data' --exec node -r ts-node/register ./src/mockApp.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "convert-svg-to-png": "^0.5.0",
+    "d3-node": "^2.1.0",
+    "datauri": "^1.1.0",
+    "dotenv": "^6.1.0",
+    "lodash": "^4.17.11",
+    "moment": "^2.24.0",
+    "nodemon": "^1.18.6",
+    "request": "^2.88.0",
+    "restify": "^7.2.2",
+    "restify-plugins": "^1.6.0",
+    "string-template": "^1.0.0",
+    "svg2png": "^4.1.1",
+    "ts-node": "^7.0.1",
+    "typescript": "^3.1.6"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.123",
+    "@types/request": "^2.48.1",
+    "@types/restify": "^7.2.6",
+    "@types/sharp": "^0.22.0",
+    "@types/string-template": "^1.0.2"
+  }
+}
