@@ -18,7 +18,6 @@
                 </mask>
                 <use id="background" fill="#FFFFFF" xlink:href="#path-1"></use>
                 {PILLS}
-                <rect id="social-section" fill="#4A4A4A" mask="url(#mask-2)" x="0" y="550" width="1200" height="80"></rect>
                 <g id="support-bill" mask="url(#mask-2)">
                     <g transform="translate(40.000000, 330.000000)">
                         <text id="最新支持法案" font-family="SF Pro Display, Helvetica, 'sans-serif'" font-size="26" font-weight="500">
@@ -41,6 +40,16 @@
                         </mask>
                         <use id="Mask" stroke="#E73A48" stroke-width="8" fill="none" xlink:href="#path-3"></use>
                         <image mask="url(#mask-4)" x="-3.515625" y="-18.75" width="155.859375" height="186.328125" xlink:href="{PROFILE_PIC_BASE64}"></image>
+                    </g>
+                </g>
+                <g id="member" mask="url(#mask-2)">
+                    <g transform="translate(234.000000, 154.000000)">
+                        <text id="Rep.-Ted-S.-Yoho" font-family="SF Pro Display, Helvetica, 'sans-serif'" font-size="46" font-weight="500">
+                            <tspan x="0" y="40" fill="#111111">{MEMBER_NAME}</tspan>
+                        </text>
+                        <text id="佛羅里達州第3區眾議員" font-family="SF Pro Text, Helvetica, 'sans-serif" font-size="30" font-weight="normal">
+                            <tspan x="0" y="80" fill="#111111">{MEMBER_TITLE}</tspan>
+                        </text>
                     </g>
                 </g>
                 <g id="info" mask="url(#mask-2)">
@@ -71,16 +80,7 @@
                         </g>
                     </g>
                 </g>
-                <g id="member" mask="url(#mask-2)">
-                    <g transform="translate(234.000000, 154.000000)">
-                        <text id="Rep.-Ted-S.-Yoho" font-family="SF Pro Display, Helvetica, 'sans-serif'" font-size="46" font-weight="500">
-                            <tspan x="0" y="40" fill="#111111">{MEMBER_NAME}</tspan>
-                        </text>
-                        <text id="佛羅里達州第3區眾議員" font-family="PingFangTC-Regular, PingFang TC" font-size="30" font-weight="normal">
-                            <tspan x="0" y="86" fill="#111111">{MEMBER_TITLE}</tspan>
-                        </text>
-                    </g>
-                </g>
+                <rect id="social-section" fill="#4A4A4A" mask="url(#mask-2)" x="0" y="550" width="1200" height="80"></rect>
                 <g id="line" mask="url(#mask-2)">
                     <g transform="translate(514.000000, 572.000000)">
                         <text id="@ustaiwanwatch" font-family="SF Pro Text, Helvetica, 'sans-serif'" font-size="20" font-weight="300">

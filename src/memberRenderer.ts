@@ -59,17 +59,7 @@ export class MemberRenderer {
     }
     if (imgType) {
       try {
-        let [
-          member,
-          picDataUri,
-          fbDataUri,
-          igDataUri,
-          lineDataUri,
-          lastAction,
-          lastActionTime,
-          terms,
-          votePercent
-        ] = await this.fetchMember(id, lang);
+        let [member, picDataUri, lastAction, lastActionTime, terms, votePercent] = await this.fetchMember(id, lang);
         let multiLines = this.multiLines(lastAction);
         let [pill1, dx1] = await this.pill("pill-area", member.memberAreaCode);
         let [pill2, dx2] = await this.pill("pill-party", member.memberParty, dx1 + 30);
@@ -77,9 +67,9 @@ export class MemberRenderer {
         let card = format(this.template, {
           PILLS: member.isInCongress ? `${pill1}${pill2}${pill3}` : `${pill1}${pill2}`,
           PROFILE_PIC_BASE64: picDataUri,
-          FB_PIC_BASE64: fbDataUri,
-          IG_PIC_BASE64: igDataUri,
-          LINE_PIC_BASE64: lineDataUri,
+          FB_PIC_BASE64: this.fb,
+          IG_PIC_BASE64: this.ig,
+          LINE_PIC_BASE64: this.line,
           AVATAR_COLOR: member.avatarColor,
           MEMBER_NAME: member.memberName,
           MEMBER_TITLE: member.memberTitle,
@@ -122,14 +112,13 @@ export class MemberRenderer {
     }
   }
 
-  // return [memberJson, imageDataUri, fbDataUri, igDataUri, lineDataUri, lastAction, lastActionTime, terms, votePercent]
-  private fetchMember(id: string, lang: Lang): Promise<[any, string, string, string, string, string, string, number, string]> {
+  // return [memberJson, imageDataUri, lastAction, lastActionTime, terms, votePercent]
+  private fetchMember(id: string, lang: Lang): Promise<[any, string, string, string, number, string]> {
     const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=profilePictures&field=bioGuideId&field=latestRole&field=congressRoles&field=cosponsoredBillIds&field=sponsoredBillIds&field=cosponsoredBills%23date`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
           const json = JSON.parse(body)[0];
-          console.log(JSON.stringify(json, null, 2));
           this.postGenerateFields(json, lang);
           return Promise.all([
             this.fetchProfile(json.profilePictures),
@@ -138,7 +127,7 @@ export class MemberRenderer {
           ]).then(([picDataUri, lastAction, ppMember]) => {
             let terms: number = ppMember.roles.map(role => role.congress).length;
             let votePercent = Number.parseFloat(ppMember.roles[0].votes_with_party_pct).toPrecision(2) + "%";
-            resolve([json, picDataUri, this.fb, this.ig, this.line, lastAction[0], lastAction[1], terms, votePercent]);
+            resolve([json, picDataUri, lastAction[0], lastAction[1], terms, votePercent]);
           });
         } else {
           reject(`can not connect url = ${url}. \nError = ${error} \nResponseCode = ${response && response.statusCode} Body = ${body}`);
@@ -358,13 +347,13 @@ export class MemberRenderer {
       pillSvg = `
       <g id="${id}" transform="translate(${40.0 + dx}, 40.000000)">
         <rect id="pill" fill="${bkgColor}" fill-rule="evenodd" x="0" y="0" width="${width + 40}" height="44" rx="20"></rect>
-        <text id="${text}" fill="none" font-family="SF Pro Display, Helvetica, 'sans-serif'" font-size="24" font-weight="${displayTextWeight}">
+        <text id="${displayText}" fill="none" font-family="SF Pro Display, Helvetica, 'sans-serif'" font-size="24" font-weight="${displayTextWeight}">
             <tspan x="${20}" y="30" fill="${textColor}">${displayText}</tspan>
         </text>
       </g>
     `;
     }
 
-    return [pillSvg, width + 2 * 20];
+    return [pillSvg, width + 2 * 15];
   }
 }
