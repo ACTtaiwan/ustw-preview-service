@@ -15,6 +15,7 @@ RUN apt-get update && \
 # Prepare fonts
 RUN rm -rf /usr/share/fonts/truetype
 COPY ./fonts/Helvetica* /usr/share/fonts/truetype/helvetica/
+COPY ./fonts/PingFang* /usr/share/fonts/truetype/pingfang/
 COPY ./fonts/SF-Pro* /usr/share/fonts/truetype/sf-pro/
 RUN fc-cache -f -v
 
