@@ -114,7 +114,7 @@ export class MemberRenderer {
 
   // return [memberJson, imageDataUri, lastAction, lastActionTime, terms, votePercent]
   private fetchMember(id: string, lang: Lang): Promise<[any, string, string, string, number, string]> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=profilePictures&field=bioGuideId&field=latestRole&field=congressRoles&field=cosponsoredBillIds&field=sponsoredBillIds&field=cosponsoredBills%23date`;
+    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=profilePictures&field=bioGuideId&field=latestRole&field=congressRoles&field=cosponsoredBillIds&field=sponsoredBillIds&field=cosponsoredBills%23date&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -237,7 +237,7 @@ export class MemberRenderer {
     lang: Lang
   ): Promise<string[]> {
     let chunckedIds = _.chunk(sponsoredBillIds, 10);
-    let promises = chunckedIds.map(idsSubset => this.fetchBills(idsSubset, ["introducedDate"]));
+    let promises = chunckedIds.map(idsSubset => this.fetchBills(idsSubset, ["introducedDate"], lang));
     let apiResult = await Promise.all(promises);
     let billsFetched = _.flatten(apiResult);
     console.log(JSON.stringify(billsFetched, null, 2));
@@ -255,7 +255,7 @@ export class MemberRenderer {
       lastDate = lastSppnsr.introducedDate;
     }
     if (lastBillId) {
-      let b = (await this.fetchBills([lastBillId], ["title", "billType", "billNumber"]))[0];
+      let b = (await this.fetchBills([lastBillId], ["title", "billType", "billNumber"], lang))[0];
       let display = [];
       display.push(`${billTypes[b.billType].display} ${b.billNumber} - ${b.title} `);
       let dateDisplay = util.localTime(lastDate);
@@ -269,11 +269,11 @@ export class MemberRenderer {
     return [""];
   }
 
-  private fetchBills(billIds: string[], fields: string[]): Promise<any[]> {
+  private fetchBills(billIds: string[], fields: string[], lang: Lang): Promise<any[]> {
     let qsp: string[] = [];
     _.each(billIds, id => qsp.push(`id=${id}`));
     _.each(fields, f => qsp.push(`field=${f}`));
-    let url = `https://api.uswatch.tw/dev/v2?${qsp.join("&")}`;
+    let url = `https://api.uswatch.tw/dev/v2?lang=${lang}&${qsp.join("&")}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {

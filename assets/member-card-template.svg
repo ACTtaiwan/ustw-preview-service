@@ -38,7 +38,7 @@
                         <mask id="mask-4" fill="white">
                             <use xlink:href="#path-3"></use>
                         </mask>
-                        <use id="Mask" stroke="#E73A48" stroke-width="8" fill="none" xlink:href="#path-3"></use>
+                        <use id="Mask" stroke="{AVATAR_COLOR}" stroke-width="8" fill="none" xlink:href="#path-3"></use>
                         <image mask="url(#mask-4)" x="-3.515625" y="-18.75" width="155.859375" height="186.328125" xlink:href="{PROFILE_PIC_BASE64}"></image>
                     </g>
                 </g>

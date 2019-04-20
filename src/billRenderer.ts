@@ -58,7 +58,7 @@ export class BillRenderer {
     }
     if (imgType) {
       try {
-        let [bill, sponsorName, sponsorTitle, picDataUri] = await this.fetchBill(id, lang);
+        let [bill, sponsorName, sponsorTitle, picDataUri, avatarColor] = await this.fetchBill(id, lang);
         let [pill1, dx1] = await this.pill("pill-congress", bill.congressDisplay);
         let [pill2, dx2] = await this.pill("pill-billCode", bill.billCodeDisplay, dx1 + 30);
         let [pill3, dx3] = await this.pill("pill-billType", bill.billTypeDisplay, dx1 + 30 + dx2 + 30);
@@ -75,7 +75,8 @@ export class BillRenderer {
           SPONSOR_TITLE: sponsorTitle,
           COSPONSORS: bill.cosponsorIds.length,
           LAST_ACTION: bill.latestActionDisplay,
-          LAST_ACTION_TIME: bill.latestActionTime
+          LAST_ACTION_TIME: bill.latestActionTime,
+          AVATAR_COLOR: avatarColor
         });
         await this.respondCard(card, res, imgType);
       } catch (e) {
@@ -105,20 +106,20 @@ export class BillRenderer {
     }
   }
 
-  // return [memberJson, sponsorName, sponsorTitle, picDataUri]
-  private fetchBill(id: string, lang: Lang): Promise<[any, string, string, string]> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=title&field=congress&field=billType&field=billNumber&field=introducedDate&field=sponsorIds&field=cosponsorIds&field=actions`;
+  // return [memberJson, sponsorName, sponsorTitle, picDataUri, avatarColor]
+  private fetchBill(id: string, lang: Lang): Promise<[any, string, string, string, string]> {
+    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=title&field=congress&field=billType&field=billNumber&field=introducedDate&field=sponsorIds&field=cosponsorIds&field=actions&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
           const json = JSON.parse(body)[0];
           console.log(JSON.stringify(json, null, 2));
           this.postGenerateFields(json, lang);
-          return Promise.all([this.fetchMember(json.sponsorIds[0]), this.fetchMemberProfilePic(json.sponsorIds[0])]).then(
+          return Promise.all([this.fetchMember(json.sponsorIds[0], lang), this.fetchMemberProfilePic(json.sponsorIds[0], lang)]).then(
             ([member, picDataUri]) => {
               const sponsorName = this.sponsorName(member, json, lang);
-              const sponsorTitle = this.sponsorTitle(member, json, lang);
-              resolve([json, sponsorName, sponsorTitle, picDataUri]);
+              const [sponsorTitle, avatarColor] = this.sponsorTitleAndAvatarColor(member, json, lang);
+              resolve([json, sponsorName, sponsorTitle, picDataUri, avatarColor]);
             }
           );
         } else {
@@ -146,8 +147,8 @@ export class BillRenderer {
     }
   }
 
-  private fetchMemberProfilePic(id: string): Promise<any> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=profilePictures`;
+  private fetchMemberProfilePic(id: string, lang: Lang): Promise<any> {
+    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=profilePictures&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -162,8 +163,8 @@ export class BillRenderer {
     });
   }
 
-  private fetchMember(id: string): Promise<any> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=congressRoles`;
+  private fetchMember(id: string, lang: Lang): Promise<any> {
+    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=congressRoles&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -202,7 +203,8 @@ export class BillRenderer {
     json.latestActionTime = util.localTime(latest.datetime);
   }
 
-  private sponsorTitle(member, bill, lang: Lang): string {
+  // return [title, avatar color]
+  private sponsorTitleAndAvatarColor(member, bill, lang: Lang): [string, string] {
     util.hydrateCongressRoles(member, lang);
 
     const sponsoredTime = parseInt(bill.introducedDate);
@@ -212,19 +214,35 @@ export class BillRenderer {
     const state = this.states[sponsorRole.state][lang];
     const district = sponsorRole.district;
 
+    let sponsorTitle = '';
     if (lang === "zh") {
       if (district) {
-        return `${state}第${district}區${title}`;
+        sponsorTitle = `${state}第${district}區${title}`;
       } else {
-        return `${state}${title}`;
+        sponsorTitle = `${state}${title}`;
       }
     } else {
       if (district) {
-        return `${title} for ${state}'s ${district}th congressional district`;
+        sponsorTitle = `${title} for ${state}'s ${district}th congressional district`;
       } else {
-        return `${title} for ${state}`;
+        sponsorTitle = `${title} for ${state}`;
       }
     }
+
+    // avatarColor
+    let avatarColor = "#4a4a4a";
+    if (sponsorRole && sponsorRole.party) {
+      switch (sponsorRole.party) {
+        case "Republican":
+          avatarColor = "#e73a48";
+          break;
+        case "Democrat":
+          avatarColor = "#4b8fea";
+          break;
+      }
+    }
+
+    return [sponsorTitle, avatarColor];
   }
 
   private sponsorName(member, bill, lang: Lang): string {
