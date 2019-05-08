@@ -7,6 +7,7 @@ import billTypes from "./billType";
 import { Lang, ReqImgType } from "./utility";
 import * as puppeteer from "puppeteer";
 import * as util from "./utility";
+import { AppConfig } from "./appConfig";
 
 const D3Node = require("d3-node");
 const svg2png = require("svg2png");
@@ -108,7 +109,7 @@ export class BillRenderer {
 
   // return [memberJson, sponsorName, sponsorTitle, picDataUri, avatarColor]
   private fetchBill(id: string, lang: Lang): Promise<[any, string, string, string, string]> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=title&field=congress&field=billType&field=billNumber&field=introducedDate&field=sponsorIds&field=cosponsorIds&field=actions&lang=${lang}`;
+    const url = `${AppConfig.api}/v2?id=${id}&field=title&field=congress&field=billType&field=billNumber&field=introducedDate&field=sponsorIds&field=cosponsorIds&field=actions&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -148,7 +149,7 @@ export class BillRenderer {
   }
 
   private fetchMemberProfilePic(id: string, lang: Lang): Promise<any> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=profilePictures&lang=${lang}`;
+    const url = `${AppConfig.api}/v2?id=${id}&field=profilePictures&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -164,7 +165,7 @@ export class BillRenderer {
   }
 
   private fetchMember(id: string, lang: Lang): Promise<any> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=congressRoles&lang=${lang}`;
+    const url = `${AppConfig.api}/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=congressRoles&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {

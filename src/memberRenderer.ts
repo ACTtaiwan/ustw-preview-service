@@ -7,6 +7,7 @@ import billTypes from "./billType";
 import * as util from "./utility";
 import * as puppeteer from "puppeteer";
 import { Lang, ReqImgType } from "./utility";
+import { AppConfig } from "./appConfig";
 
 const D3Node = require("d3-node");
 const svg2png = require("svg2png");
@@ -114,7 +115,7 @@ export class MemberRenderer {
 
   // return [memberJson, imageDataUri, lastAction, lastActionTime, terms, votePercent]
   private fetchMember(id: string, lang: Lang): Promise<[any, string, string, string, number, string]> {
-    const url = `https://api.uswatch.tw/prod/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=profilePictures&field=bioGuideId&field=latestRole&field=congressRoles&field=cosponsoredBillIds&field=sponsoredBillIds&field=cosponsoredBills%23date&lang=${lang}`;
+    const url = `${AppConfig.api}/v2?id=${id}&field=firstName&field=lastName&field=middleName&field=profilePictures&field=bioGuideId&field=latestRole&field=congressRoles&field=cosponsoredBillIds&field=sponsoredBillIds&field=cosponsoredBills%23date&lang=${lang}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
@@ -273,7 +274,7 @@ export class MemberRenderer {
     let qsp: string[] = [];
     _.each(billIds, id => qsp.push(`id=${id}`));
     _.each(fields, f => qsp.push(`field=${f}`));
-    let url = `https://api.uswatch.tw/dev/v2?lang=${lang}&${qsp.join("&")}`;
+    let url = `${AppConfig.api}/v2?lang=${lang}&${qsp.join("&")}`;
     return new Promise((resolve, reject) => {
       request.get(url, (error, response, body) => {
         if (!error && response.statusCode === 200) {
